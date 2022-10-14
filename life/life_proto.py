@@ -1,4 +1,3 @@
-import copy
 import random
 import typing as tp
 
@@ -30,35 +29,35 @@ class GameOfLife:
         # Скорость протекания игры
         self.speed = speed
 
-        # Первая отрисовка поля
-        self.grid = [[]]
+        # Список клеток
+        self.grid = self.create_grid()
 
     def draw_lines(self) -> None:
-        """ Отрисовать сетку """
+        """Отрисовать сетку"""
         for x in range(0, self.width, self.cell_size):
             pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
         for y in range(0, self.height, self.cell_size):
             pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
 
     def run(self) -> None:
-        """ Запустить игру """
+        """Запустить игру"""
         pygame.init()
         clock = pygame.time.Clock()
-        pygame.display.set_caption('Game of Life')
-        self.screen.fill(pygame.Color('white'))
-        # список клеток
-        self.grid = self.create_grid(randomize=True)
+        pygame.display.set_caption("Game of Life")
+        self.screen.fill(pygame.Color("white"))
+
         running = True
         while running:
             for event in pygame.event.get():
-                if event.type == QUIT:
+                if event.type == pygame.QUIT:
                     running = False
-            self.draw_grid()
-            self.draw_lines()
 
-            self.grid = self.get_next_generation()
+            # Отрисовка списка клеток
+            # Выполнение одного шага игры (обновление состояния ячеек)
             self.draw_grid()
             self.draw_lines()
+            self.grid = self.get_next_generation()
+
             pygame.display.flip()
             clock.tick(self.speed)
         pygame.quit()
@@ -93,14 +92,21 @@ class GameOfLife:
         return neighbours
 
     def get_next_generation(self) -> Grid:
-        new_grid = copy.deepcopy(self.grid)  # полная копия
-        for h in range(self.cell_height):
-            for w in range(self.cell_width):
-                neighbours = self.get_neighbours((h, w))  # получили соседей
-                alive_neighbours = sum(neighbours)  # сумма единиц, т.е. живых клеток
-                if alive_neighbours != 2 and alive_neighbours != 3:
-                    new_grid[h][w] = 0  # мёртвая
-                elif alive_neighbours == 3:
-                    new_grid[h][w] = 1  # рождается новая
-
+        new_grid = []
+        for y, row in enumerate(self.grid):
+            new_row = []
+            for x, cell in enumerate(row):
+                neighbours = self.get_neighbours((y, x))
+                live_neighbours = neighbours.count(1)
+                if cell and (live_neighbours < 2 or live_neighbours > 3):
+                    new_row.append(0)
+                elif not cell and live_neighbours == 3:
+                    new_row.append(1)
+                else:
+                    new_row.append(cell)
+            new_grid.append(new_row)
         return new_grid
+
+
+game = GameOfLife(320, 240, 20)
+game.run()
