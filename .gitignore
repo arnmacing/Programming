@@ -1,0 +1,21 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Unit tests / coverage reports
+.coverage
+.cache
+coverage.xml
+
+# Mypy cache
+.mypy_cache/
+
+/venv/
+/.vscode/
+/.github/
+/include/
+/Lib/
+/Scripts/
