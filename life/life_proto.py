@@ -51,21 +51,18 @@ class GameOfLife:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-
-            # Отрисовка списка клеток
-            # Выполнение одного шага игры (обновление состояния ячеек)
-            self.draw_grid()
             self.draw_lines()
-            self.grid = self.get_next_generation()
-
+            self.draw_grid()
             pygame.display.flip()
             clock.tick(self.speed)
         pygame.quit()
 
     def create_grid(self, randomize: bool = False) -> Grid:
+        # создание матрицы клеток размером cell_height/width
         grid = [
-            [random.randint(0, 1) if randomize else 0 for j in range(self.cell_width)]
-            for i in range(self.cell_height)
+            #  клетка может находиться в двух состояниях: «живая» или «мертвая»
+            [random.randint(0, 1) if randomize else 0 for _ in range(self.cell_width)]
+            for _ in range(self.cell_height)
         ]
         return grid
 
@@ -75,12 +72,15 @@ class GameOfLife:
                 y = h * self.cell_size
                 x = w * self.cell_size
                 color = pygame.Color('white') if self.grid[h][w] == 0 else pygame.Color('green')
-                # Rect - координаты прямоугольника в формате (x, y, длина стороны a, длина стороны b)
-                # Screen - где нужно отрисовать прямоугольник
+                # принимает: screen - где нужно отрисовать прямоугольник; цвет; координаты прямоугольника (x,y,
+                # длина a,длина b)
                 pygame.draw.rect(self.screen, color, [x + 1, y + 1, self.cell_size - 1, self.cell_size - 1])
 
     def get_neighbours(self, cell: Cell) -> Cells:
+        # получает для клетки список ее соседей
         neighbours = []
+        # Соседними считаются клетки по горизонтали, вертикали и диагоналям,
+        # то есть, во всех направлениях.
         for i in range(-1, 2):
             for j in range(-1, 2):
                 h = cell[0] + i
@@ -92,8 +92,10 @@ class GameOfLife:
         return neighbours
 
     def get_next_generation(self) -> Grid:
+        # Получить следующее поколение клеток
         new_grid = []
-        for y, row in enumerate(self.grid):
+        for y, row in enumerate(self.grid):  # enumerate вернет кортеж, счётчик количества элементов в
+            # последовательности
             new_row = []
             for x, cell in enumerate(row):
                 neighbours = self.get_neighbours((y, x))
@@ -108,5 +110,4 @@ class GameOfLife:
         return new_grid
 
 
-game = GameOfLife(320, 240, 20)
-game.run()
+GameOfLife(320, 240, 20).run()

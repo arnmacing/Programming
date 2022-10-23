@@ -2,7 +2,6 @@ import pathlib
 import random
 import typing as tp
 
-import pygame
 from pygame.locals import *
 
 Cell = tp.Tuple[int, int]
@@ -30,8 +29,8 @@ class GameOfLife:
 
     def create_grid(self, randomize: bool = False) -> Grid:
         grid = [
-            [random.randint(0, 1) if randomize else 0 for j in range(self.cols)]
-            for i in range(self.rows)
+            [random.randint(0, 1) if randomize else 0 for _ in range(self.cols)]
+            for _ in range(self.rows)
         ]
         return grid
 
@@ -64,25 +63,28 @@ class GameOfLife:
         return new_grid
 
     def step(self) -> None:
-        self.prev_generation = self.curr_generation
+        self.prev_generation = self.curr_generation  # предыдущее = текущее
         next_generation = self.get_next_generation()
-        self.curr_generation = next_generation
-        self.generations += 1
+        self.curr_generation = next_generation  # текущее = следующее
+        self.generations += 1  # + поколение
 
     @property
     def is_max_generations_exceeded(self) -> bool:
+        #  Не превысило ли текущее число поколений максимально допустимое.
         if self.max_generations and self.generations >= self.max_generations:
             return True
         return False
 
     @property
     def is_changing(self) -> bool:
+        # Изменилось ли состояние клеток с предыдущего шага
         if self.prev_generation == self.curr_generation:
             return False
         return True
 
     @staticmethod
     def from_file(filename: pathlib.Path) -> 'GameOfLife':
+        # Чтение состояния клеток из указанного файла
         with filename.open() as file:
             grid = [list(map(int, col.strip())) for col in file.readlines()]
         size = len(grid), len(grid[0])
@@ -91,5 +93,6 @@ class GameOfLife:
         return game
 
     def save(self, filename: pathlib.Path) -> None:
+        # Сохранение текущего состояния клеток в указанный файл
         with filename.open('w') as file:
             file.write('\n'.join([''.join(map(str, col)) for col in self.curr_generation]))

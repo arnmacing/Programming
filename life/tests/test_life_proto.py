@@ -4,7 +4,7 @@ import random
 import unittest
 from unittest.mock import MagicMock
 
-from life import life_proto
+import life_proto
 
 life_proto.pygame.display = MagicMock()
 

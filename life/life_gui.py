@@ -5,7 +5,7 @@ from ui import UI
 
 
 class GUI(UI):
-    def __init__(self, life: GameOfLife, cell_size: int = 10, speed: int = 10) -> None:
+    def __init__(self, life: GameOfLife, cell_size: int = 20, speed: int = 10) -> None:
         super().__init__(life)
 
         self.cell_size = cell_size
@@ -30,6 +30,7 @@ class GUI(UI):
             y += self.cell_size
 
     def run(self) -> None:
+        global click_x, click_y
         pygame.init()
         clock = pygame.time.Clock()
         pygame.display.set_caption("Game of Life")
@@ -37,15 +38,15 @@ class GUI(UI):
 
         running = True
         paused = clicked = False
-        while running and not self.life.is_max_generations_exceeded:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+        while running and not self.life.is_max_generations_exceeded:  # запущено и число генерации в порядке
+            for event in pygame.event.get():  # получение событий из очереди
+                if event.type == pygame.QUIT:  # выход
                     running = False
 
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:  # пауза
                     paused = not paused
 
-                if not self.life.is_changing:
+                if not self.life.is_changing:  # не изменено состояние клеток
                     paused = True
 
                 if paused and event.type == pygame.MOUSEBUTTONDOWN:  # нажатие кнопки
@@ -56,7 +57,7 @@ class GUI(UI):
                 if clicked:
                     prev_cell_state = self.life.curr_generation[click_y // self.cell_size][
                         click_x // self.cell_size
-                        ]
+                        ]  # предыдущее состояние ячейки
                     self.life.curr_generation[click_y // self.cell_size][
                         click_x // self.cell_size
                         ] = (0 if prev_cell_state == 1 else 1)
@@ -70,5 +71,4 @@ class GUI(UI):
         pygame.quit()
 
 
-gui = GUI(GameOfLife((100, 100), max_generations=100))
-gui.run()
+GUI(GameOfLife((25, 25), max_generations=50)).run()
